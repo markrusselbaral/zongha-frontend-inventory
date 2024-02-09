@@ -1,5 +1,5 @@
 import toast from 'react-hot-toast';
-import dataJSON from '../../public/data.json';
+// import dataJSON from '../../public/data.json';
 
 
 const createToast=(title: string, msg: string, type: number)=>{toast.custom((t) => (
@@ -8,7 +8,7 @@ const createToast=(title: string, msg: string, type: number)=>{toast.custom((t) 
       className={`${
         t.visible ? 'animate-enter' : 'animate-leave'
       }
-      max-w-md w-full ${type=='0'?"bg-[#04b20c]":type=='1'?"bg-[#eab90f]":"bg-[#e13f32]"} shadow-lg rounded-lg pointer-events-auto flex ring-1 ring-black ring-opacity-5`}
+      max-w-md w-full ${type==0?"bg-[#04b20c]":type==1?"bg-[#eab90f]":"bg-[#e13f32]"} shadow-lg rounded-lg pointer-events-auto flex ring-1 ring-black ring-opacity-5`}
     >
       <div className="flex-1 w-0 p-4 ">
         <div className="flex items-start">
@@ -51,19 +51,19 @@ const createToast=(title: string, msg: string, type: number)=>{toast.custom((t) 
       </div>
     </div>
   ))};
-// let dataJSON: any;
-// let headers = new Headers();
-// headers.append('Access-Control-Allow-Origin', 'http://127.0.0.1:8000');
-// headers.append("Access-Control-Allow-Methods", 'POST');
-// headers.append("Access-Control-Allow-Headers", 'Content-Type, Authorization');
-// fetch("http://127.0.0.1:8000/data",{method:'POST',headers:headers})
-//   .then(response => {
-//     return response
-//   })
-//   .then(data => {
-//     console.log(data);
-//     dataJSON=data;
-//   })
+let dataJSON: any;
+let headers = new Headers();
+headers.append('Access-Control-Allow-Origin', 'http://127.0.0.1:8000');
+headers.append("Access-Control-Allow-Methods", 'POST');
+headers.append("Access-Control-Allow-Headers", 'Content-Type, Authorization');
+fetch("http://127.0.0.1:8000/data",{method:'POST',headers:headers})
+  .then(response => {
+    return response
+  })
+  .then(data => {
+    console.log(data);
+    dataJSON=data;
+  })
 const fireToast = () => {
 const alertSettings=localStorage.getItem("alertSettings");
 if (alertSettings){

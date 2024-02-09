@@ -5,6 +5,9 @@ module.exports = {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   darkMode: 'class',
   theme: {
+    backgroundImage: {
+      login: 'url("/peakpx.jpg")',
+    },
     fontFamily: {
       satoshi: ['Satoshi', 'sans-serif'],
     },

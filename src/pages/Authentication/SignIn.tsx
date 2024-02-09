@@ -1,23 +1,85 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import Breadcrumb from '../../components/Breadcrumbs/Breadcrumb';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+// import Breadcrumb from '../../components/Breadcrumbs/Breadcrumb';
 import LogoDark from '../../images/logo/logo-dark.svg';
 import Logo from '../../images/logo/logo.svg';
-import DefaultLayout from '../../layout/DefaultLayout';
+import "../../index.css"
+// import DefaultLayout from '../../layout/DefaultLayout';
+import axios from '../../api/axios';
+
+import { PiEyeClosedBold , PiEyeBold } from "react-icons/pi";
 
 const SignIn: React.FC = () => {
-  return (
-    <DefaultLayout>
-      <Breadcrumb pageName="Sign In" />
+  const navigate = useNavigate();
+  const [email , setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [errorMessage, setErrorMessage] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
+  const [emailReq, setEmailReq] = useState('')
+  const [passReq, setPassReq] = useState('')
 
-      <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-        <div className="flex flex-wrap items-center">
-          <div className="hidden w-full xl:block xl:w-1/2">
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if(email === '' && password === ''){
+      setEmailReq('Email Required')
+      setPassReq('Password Required')
+    }else if(password === ''){
+      setPassReq('Password Required')
+      setEmailReq('')
+    }else if(email === ''){
+      setEmailReq('Email Required')
+      setPassReq('')
+    }else{
+      try {
+        setIsLoading(!isLoading)
+        // Use axios instance 'axios' instead of 'Axios'
+        await axios.post('/login', {email, password});
+        setEmail('');
+        setPassword('');
+        setPassReq('')
+        setEmailReq('')
+        navigate('/dashboard');
+        setIsLoading(!isLoading)
+      } catch (error: any) {
+        console.log(error.response.data.message);
+        setErrorMessage(error.response.data.message);
+        setPassReq('')
+        setEmailReq('')
+        setIsLoading(isLoading)
+      }
+    }
+  }
+
+  const [isShow, setIsShow] = useState(false)
+
+  const handleShowPass = () => {
+      setIsShow(!isShow)
+  }
+
+  useEffect(() => {
+    let timeOut: NodeJS.Timeout | undefined;
+
+    if(errorMessage !== ''){
+      timeOut = setTimeout(()=>{
+        setErrorMessage('')
+      },3000)
+    }
+
+    return () => clearTimeout(timeOut);
+  },[errorMessage])
+
+  return (
+    <section className='h-screen bg-login'>
+      {/* <Breadcrumb pageName="Sign In" /> */}
+
+      <div className="rounded-sm border h-full flex justify-center items-center border-stroke  shadow-default dark:border-strokedark dark:bg-boxdark">
+        <div className="flex items-center bg-white/90 backdrop-blur-md rounded-3xl">
+          <div className="hidden w-full lg:flex xl:w-1/2">
             <div className="py-17.5 px-26 text-center">
-              <Link className="mb-5.5 inline-block" to="/">
+              <div className="mb-5.5 inline-block" >
                 <img className="hidden dark:block" src={Logo} alt="Logo" />
                 <img className="dark:hidden" src={LogoDark} alt="Logo" />
-              </Link>
+              </div>
 
               <p className="2xl:px-20">
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit
@@ -151,12 +213,19 @@ const SignIn: React.FC = () => {
 
           <div className="w-full border-stroke dark:border-strokedark xl:w-1/2 xl:border-l-2">
             <div className="w-full p-4 sm:p-12.5 xl:p-17.5">
-              <span className="mb-1.5 block font-medium">Start for free</span>
-              <h2 className="mb-9 text-2xl font-bold text-black dark:text-white sm:text-title-xl2">
-                Sign In to TailAdmin
+              {/* <span className="mb-1.5 block font-medium">Start for free</span> */}
+              <h2 className="mb-5 text-2xl font-bold text-black dark:text-white sm:text-title-xl2">
+                Sign In to Meat Shop-IMS
               </h2>
+                {/* {errorMessage !== '' ? */}
+                  <div className={`flex justify-center items-center bg-red-500 rounded-md ${errorMessage !=='' ? "visible opacity-1 scale-100" : "invisible opacity-0 scale-50"} transition-all duration-300 delay-75`}>
+                    <h2 className=' text-white text-xl'><span className='text-red-500'>.</span>{errorMessage}</h2>
+                  </div>
+                  {/* :
+                  null
+                } */}
 
-              <form>
+              <form onSubmit={handleLogin} className='mt-2'>
                 <div className="mb-4">
                   <label className="mb-2.5 block font-medium text-black dark:text-white">
                     Email
@@ -164,9 +233,12 @@ const SignIn: React.FC = () => {
                   <div className="relative">
                     <input
                       type="email"
+                      value={email}
                       placeholder="Enter your email"
-                      className="w-full rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="placeholder:text-blue-600/80 w-full rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                     />
+                    <h4 className='italic text-red-500 text-[13px]'>{emailReq}</h4>
 
                     <span className="absolute right-4 top-4">
                       <svg
@@ -190,16 +262,25 @@ const SignIn: React.FC = () => {
 
                 <div className="mb-6">
                   <label className="mb-2.5 block font-medium text-black dark:text-white">
-                    Re-type Password
+                    Password
                   </label>
                   <div className="relative">
                     <input
-                      type="password"
+                      type={isShow ? "text" : "password"}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
                       placeholder="6+ Characters, 1 Capital letter"
-                      className="w-full rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                      className="placeholder:text-blue-600/80 w-full rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                     />
+                    <h4 className='italic text-red-500 text-[13px]'>{passReq}</h4>
 
-                    <span className="absolute right-4 top-4">
+
+                    <div className="absolute right-4 top-4 flex justify-center items-center gap-2">
+                      {isShow ?
+                          <PiEyeClosedBold className={`text-xl hover:text-blue-600 transition-all duration-200 delay-75 ${password === '' ? "invisible scale-50 opacity-0" : "visible scale-100 opacity-1"} transition-all duration-150 delay-75`} onClick={handleShowPass}/>
+                          :
+                          <PiEyeBold className={`text-xl hover:text-blue-600 transition-all duration-200 delay-75 ${password === '' ? "invisible scale-50 opacity-0" : "visible scale-100 opacity-1"} transition-all duration-150 delay-75`} onClick={handleShowPass}/>
+                      }
                       <svg
                         className="fill-current"
                         width="22"
@@ -219,19 +300,21 @@ const SignIn: React.FC = () => {
                           />
                         </g>
                       </svg>
-                    </span>
+                    </div>
                   </div>
                 </div>
 
                 <div className="mb-5">
                   <input
                     type="submit"
+                    disabled={isLoading}
+                    // title={!isLoading ? "Disabled" : ""}
                     value="Sign In"
-                    className="w-full cursor-pointer rounded-lg border border-primary bg-primary p-4 text-white transition hover:bg-opacity-90"
+                    className={`${isLoading ? "bg-blue-500" : "hover:bg-opacity-90"} w-full cursor-pointer rounded-lg border border-primary bg-primary p-4 text-white transition`}
                   />
                 </div>
 
-                <button className="flex w-full items-center justify-center gap-3.5 rounded-lg border border-stroke bg-gray p-4 hover:bg-opacity-50 dark:border-strokedark dark:bg-meta-4 dark:hover:bg-opacity-50">
+                {/* <button className="flex w-full items-center justify-center gap-3.5 rounded-lg border border-stroke bg-gray p-4 hover:bg-opacity-50 dark:border-strokedark dark:bg-meta-4 dark:hover:bg-opacity-50">
                   <span>
                     <svg
                       width="20"
@@ -275,13 +358,13 @@ const SignIn: React.FC = () => {
                       Sign Up
                     </Link>
                   </p>
-                </div>
+                </div> */}
               </form>
             </div>
           </div>
         </div>
       </div>
-    </DefaultLayout>
+    </section>
   );
 };
 

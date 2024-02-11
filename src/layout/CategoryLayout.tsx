@@ -99,7 +99,7 @@ const CategoryLayout: React.FC<{ children: ReactNode }> = ({ children }) => {
       <div className='subCategory h-14 mb-2  rounded-sm border gap-3 px-4 flex items-center border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark overflow-x-auto'>
       {/* <NavLink to={`/table/0`} type='button' className={`${categoryId === 0 ? 'bg-blue-700 dark:bg-blue-500' : ''} px-6 py-1 text-[12px] font-semibold text-white dark:text-black dark:bg-white bg-boxdark rounded-md`} style={{ whiteSpace: 'nowrap' }} >All</NavLink> */}
           {subCaterogy.map((item,index) => (
-            <NavLink to={`/product/${item.id}`} key={index} type='button' className={`${categoryId === item.id && 'bg-[#3c50e0] dark:bg-[#3c50e0] dark:text-white'} px-6 py-1 text-[12px] font-semibold text-white dark:text-black dark:bg-white bg-boxdark rounded-md`} style={{ whiteSpace: 'nowrap' }} >{item.name}</NavLink>
+            <NavLink to={`/product/${item.id}`} key={index} type='button' className={`${categoryId === item.id && 'bg-[#4156f4] dark:bg-[#4156f4] dark:text-white'} px-6 py-1 text-[12px] font-semibold text-white dark:text-black dark:bg-white bg-boxdark rounded-md`} style={{ whiteSpace: 'nowrap' }} >{item.name}</NavLink>
           ))}
       </div>
 

@@ -1,87 +1,17 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { WAREHOUSE } from '../../types/warehouse'
 import { PRODUCT } from '../../types/product';
 import { IoCloseSharp} from "react-icons/io5";
 import { MdAddShoppingCart} from "react-icons/md";
 
+
 interface ModalProductProps {
     clickOn: (e: React.MouseEvent<HTMLDivElement>) => void;
     isOpenModal: boolean;
     handleModal: () => void;
+    editId: number | null;
+    productList: PRODUCT[];
   }
-
- const productList : PRODUCT[] = [
-    {
-      id : 1,
-      pcode : "BF78S78",
-      name : "Beef Steak",
-      image: "/image.jpg",
-      warehouse: "Warehouse 1",
-      date: "02-05-2000 07:00 PM",
-      quantity: 90,
-      price: 280,
-    },
-    {
-      id : 2,
-      pcode : "PK89883d",
-      name : "Pork Tinidok",
-      image: "/image.jpg",
-      warehouse: "Warehouse 1",
-      date: "02-05-2000 07:00 PM",
-      quantity: 90,
-      price: 280,
-    },
-    {
-      id : 3,
-      pcode : "BF78S78",
-      name : "Beef Steakss",
-      image: "/image.jpg",
-      warehouse: "Warehouse 1",
-      date: "02-05-2000 07:00 PM",
-      quantity: 90,
-      price: 280,
-    },
-    {
-      id : 4,
-      pcode : "BF78S78",
-      name : "Beef Steakss",
-      image: "/image.jpg",
-      warehouse: "Warehouse 1",
-      date: "02-05-2000 07:00 PM",
-      quantity: 90,
-      price: 280,
-    },
-    {
-      id : 5,
-      pcode : "BF78S78",
-      name : "Beef Steakss",
-      image: "/image.jpg",
-      warehouse: "Warehouse 1",
-      date: "02-05-2000 07:00 PM",
-      quantity: 90,
-      price: 280,
-    },
-    {
-        id : 5,
-        pcode : "BF78S78",
-        name : "Beef Steakss",
-        image: "/image.jpg",
-        warehouse: "Warehouse 1",
-        date: "02-05-2000 07:00 PM",
-        quantity: 90,
-        price: 280,
-      },
-      {
-        id : 5,
-        pcode : "BF78S78",
-        name : "Beef Steakss",
-        image: "/image.jpg",
-        warehouse: "Warehouse 1",
-        date: "02-05-2000 07:00 PM",
-        quantity: 90,
-        price: 280,
-      },
-  ]
 
 const warehouseList: WAREHOUSE[] = [
     {
@@ -96,7 +26,7 @@ const warehouseList: WAREHOUSE[] = [
     }
 ] 
 
-const ModalProduct: React.FC<ModalProductProps> = ({ clickOn, isOpenModal, handleModal }) => {
+const ModalProduct: React.FC<ModalProductProps> = ({ clickOn, isOpenModal, handleModal, editId, productList}) => {
 
     const [isAutoSuggest, setIsAutoSuggest] = useState<boolean>(false)
 
@@ -119,6 +49,19 @@ const ModalProduct: React.FC<ModalProductProps> = ({ clickOn, isOpenModal, handl
             ...product, [inputName] : inputValue
         })
     }
+    const handleInputImage = (e : React.ChangeEvent<HTMLInputElement>) => {
+        const inputName = e.target.name
+        const inputValue = e.target.files && e.target.files[0]
+
+        console.log(inputValue)
+
+        if (inputValue !== null && inputValue !== undefined) {
+            setProduct({
+                ...product,
+                [inputName]: inputValue.name
+            });
+        }
+    }
 
     const handleInputAuto = (e : React.ChangeEvent<HTMLInputElement>) => {
         const inputName = e.target.name
@@ -140,12 +83,34 @@ const ModalProduct: React.FC<ModalProductProps> = ({ clickOn, isOpenModal, handl
         })
     }
 
+    const fetchProduct = () => {
+        if(editId){
+        const dataProduct  = productList.find(item => item.id === editId)
+        console.log(dataProduct)
+            if(dataProduct){
+                setProduct({...product, pId : dataProduct.id, pName : dataProduct.name, pCode: dataProduct.pcode, pImage: dataProduct.image, pWarehouse : dataProduct.warehouse, pQuantity : dataProduct.quantity, pPrice : dataProduct.price })
+            }
+        }else{
+            setProduct({...product, pName: "", pId: 0, pCode: "", pImage: "", pWarehouse : "", pWarehouseId: 0, pQuantity : 0, pPrice : 0, })
+        }
+    }
+
+    useEffect(() => {
+        fetchProduct()
+    },[editId])
+
+    useEffect(() => {
+        if(!editId){
+            setProduct({...product, pName: "", pId: 0, pCode: "", pImage: "", pWarehouse : "", pWarehouseId: 0, pQuantity : 0, pPrice : 0, })
+        }
+    } ,[isOpenModal === false])
+
   return (
     <section className={`relative overflow-hidden py-2 px-6 h-fit md:h-[85%] w-[90%] md:[50%] lg:w-[40%] border-2 border-blue-600 dark:border-white rounded-xl bg-white dark:bg-boxdark text-black dark:text-white ${!isOpenModal ? "invisible scale-50 opacity-0" : "visible scale-100 opacity-1"} transition-all duration-200 delay-75`} onClick={clickOn}>
             <IoCloseSharp className='absolute top-0 right-0 bg-[#ff0000] rounded-bl-xl text-white h-7 w-10 p-[3px]' onClick={handleModal}/>
             <div className='flex gap-2 text-2xl font-semibold items-center mb-2'>
                 <MdAddShoppingCart />
-                <h2>Add Product</h2>
+                <h2>{editId ? "Update Product" : "Add Product"}</h2>
             </div>
             <div className='h-[2px] w-full bg-blue-600 dark:bg-white mb-2'/>
             <div className='h-full'>
@@ -178,10 +143,11 @@ const ModalProduct: React.FC<ModalProductProps> = ({ clickOn, isOpenModal, handl
                             </div>
                         </div>
                         <div className='flex flex-col w-full '>
+                        {/* placeholder='' value={product.pImage} */}
                             <label htmlFor="pImage" className='pb-1 pl-1 font-semibold'>Product Image</label>
                             <div className='relative w-full'>
                                 <IoCloseSharp className={`absolute top-[10px] right-2 bg-blue-700/50 p-[1px] rounded-full ${product.pImage === '' ? 'invisible' : 'visible'}`} onClick={() => setProduct({...product, pImage : ''})}/>
-                                <input type="file" name="pImage" id="pImage" placeholder='' value={product.pImage} className='h-9 w-full bg-black/10 dark:bg-white border-[1px] border-blue-600 rounded-md text-blue-700 font-semibold outline-1 pl-2 pr-8' onChange={handleInput}/>
+                                <input type="file" accept="image/png, image/jpeg, image/jpg, image/webp" name="pImage" id="pImage" className='h-9 w-full bg-black/10 dark:bg-white border-[1px] border-blue-600 rounded-md text-blue-700 font-semibold outline-1 pl-2 pr-8' onChange={handleInputImage}/>
                             </div>
                         </div>
                         <div className='flex flex-col w-full '>
@@ -191,10 +157,10 @@ const ModalProduct: React.FC<ModalProductProps> = ({ clickOn, isOpenModal, handl
                             <div className='relative w-full'>
                                 {/* <IoCloseSharp className={`absolute top-[10px] right-2 bg-blue-700/50 p-[1px] rounded-full ${product.pWarehouse === '' ? 'invisible' : 'visible'}`} onClick={() => setProduct({...product, pWarehouse : 'Choose Warehouse'})}/> */}
                                 {/* <input type="text" name="pWarehouse" id="pWarehouse" placeholder='Beef Steak' value={product.pWarehouse} className='h-9 w-full bg-black/10 dark:bg-white border-[1px] border-blue-600 rounded-md text-blue-700 font-semibold outline-1 pl-2 pr-8' onChange={handleInput}/> */}
-                                <select name="pWarehouse" id="pWarehouse" required className='h-9 w-full bg-black/10 dark:bg-white border-[1px] border-blue-600 rounded-md text-blue-700 font-semibold outline-1 pl-2 pr-8' value={product.pWarehouse} onChange={handleSelect}>
+                                <select name="pWarehouse" id="pWarehouse" required className='h-9 w-full bg-black/10 dark:bg-white border-[1px] border-blue-600 rounded-md text-blue-700 font-semibold outline-1 pl-2 pr-8' onChange={handleSelect}>
                                     <option>Choose Warehouse</option>
                                     {warehouseList.map((item,index) => (
-                                        <option key={index} value={`${item.id},${item.name}`}>{item.name}</option>
+                                        <option key={index} value={`${item.id},${item.name}`} selected={product.pWarehouse === item.name}>{item.name}</option>
                                     ))}
                                 </select>
                             </div>

@@ -61,6 +61,16 @@ const productList : PRODUCT[] = [
     quantity: 90,
     price: 280,
   },
+  {
+    id : 6,
+    pcode : "BF78S78sd",
+    name : "Belly pork",
+    image: "/image.jpg",
+    warehouse: "Warehouse 2",
+    date: "02-05-2000 07:00 PM",
+    quantity: 945,
+    price: 28023,
+  },
 ]
 
 
@@ -73,6 +83,7 @@ const TableOne = () => {
   const [btnName,setBtnName] = useState<string>('Select')
   const [checkCount, setCheckCount] = useState<number>(0)
   const [arrayCheck, setArrayChecked] = useState([])
+
 
   // const checkBoxInput: React.MutableRefObject<HTMLInputElement[]> = useRef<HTMLInputElement[]>([]);
 
@@ -183,6 +194,10 @@ const TableOne = () => {
   const [editId, setEditId] = useState<number | null>(null);
 
   const handleModal = () => {
+    console.log(editId)
+    if(editId ){
+      setEditId(null)
+    }
     setIsOpenMpdal(!isOpenModal)
   }
 
@@ -193,7 +208,7 @@ const TableOne = () => {
       <CategoryLayout>
 
         <div className={`fixed inset-0 flex justify-center items-center z-[1000] bg-black/10 backdrop-blur-[2px] ${isOpenModal ? 'visible' : 'invisible'} transition-all duration-200 delay-75`} onClick={handleModal}>
-          <ModalProduct clickOn={(e) => e.stopPropagation()} isOpenModal={isOpenModal} handleModal={handleModal}/>
+          <ModalProduct clickOn={(e) => e.stopPropagation()} isOpenModal={isOpenModal} handleModal={handleModal} editId={editId} productList={productList}/>
         </div>
 
 
@@ -279,7 +294,7 @@ const TableOne = () => {
                                 ₱ {item.price}
                             </td>
                             <td className="px-2 py-4 flex gap-2">
-                                <button className="font-medium text-white dark:text-black bg-blue-600 dark:bg-blue-400 text-lg h-8 w-8 rounded-lg flex justify-center items-center"><RiEditCircleFill/></button>
+                                <button className="font-medium text-white dark:text-black bg-blue-600 dark:bg-blue-400 text-lg h-8 w-8 rounded-lg flex justify-center items-center" onClick={() => {setEditId(item.id); handleModal()}}><RiEditCircleFill/></button>
                                 <button className="font-medium text-white dark:text-black bg-red-600 dark:bg-red-500 text-lg h-8 w-8 rounded-lg flex justify-center items-center"><MdDelete/></button>
                             </td>
                         </tr>

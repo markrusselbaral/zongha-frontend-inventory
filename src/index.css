@@ -32,3 +32,6 @@ input[type="number"]::-webkit-inner-spin-button{
     left: 0;
     top: 0;
   }
+.activer{
+    background-color: blue;
+  }

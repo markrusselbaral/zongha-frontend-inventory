@@ -6,3 +6,29 @@ input[type="password"]::-ms-reveal,
         input[type="password"]::-ms-clear {
             display: none;
 }
+
+input[type="number"]::-webkit-inner-spin-button{
+  display: none;
+}
+
+.subCategory::-webkit-scrollbar {
+    height: 4px;
+  }
+  
+.subCategory::-webkit-scrollbar-thumb {
+    background: #3c50e0; 
+  }
+
+.modalScroll::-webkit-scrollbar {
+    width: 4px;
+  }
+
+.modalScroll::-webkit-scrollbar-thumb {
+  background: #3c50e0; 
+} 
+  /* Adjust the padding if necessary */
+::-webkit-scrollbar-track:horizontal {
+    position: absolute;
+    left: 0;
+    top: 0;
+  }

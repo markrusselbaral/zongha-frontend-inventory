@@ -37,6 +37,14 @@ const productData: Product[] = [
     sold: 72,
     profit: 103,
   },
+  {
+    image: ProductFour,
+    name: 'HP Probook 450',
+    category: 'Electronics',
+    price: 499,
+    sold: 72,
+    profit: 103,
+  },
 ];
 
 const TableTwo = () => {

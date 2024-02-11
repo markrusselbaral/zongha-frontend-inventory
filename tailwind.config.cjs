@@ -19,6 +19,7 @@ module.exports = {
     },
     extend: {
       colors: {
+        gradientHex: 'linear-gradient(132deg, rgb(2, 28, 122) 0.00%, rgb(36, 83, 255) 100.00%)',
         current: 'currentColor',
         transparent: 'transparent',
         white: '#FFFFFF',
@@ -219,6 +220,7 @@ module.exports = {
         6: '6px',
       },
       boxShadow: {
+        custom: 'rgba(50, 50, 93, 0.25) 0px 10px 20px -12px inset, rgba(0, 0, 0, 0.3) 0px 8px 36px -18px inset',
         default: '0px 8px 13px -3px rgba(0, 0, 0, 0.07)',
         card: '0px 1px 3px rgba(0, 0, 0, 0.12)',
         'card-2': '0px 1px 2px rgba(0, 0, 0, 0.05)',

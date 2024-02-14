@@ -18,8 +18,11 @@ const SignIn: React.FC = () => {
   const [emailReq, setEmailReq] = useState('')
   const [passReq, setPassReq] = useState('')
 
+  const csrf = () => axios.get('/sanctum/csrf-cookie');
+
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    await csrf();
     if(email === '' && password === ''){
       setEmailReq('Email Required')
       setPassReq('Password Required')

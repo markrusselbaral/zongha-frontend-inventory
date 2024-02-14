@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
+import axios from '../../api/axios';
 
 import UserOne from '../../images/user/user-01.png';
 
 const DropdownUser = () => {
+  const navigate = useNavigate()
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const trigger = useRef<any>(null);
@@ -34,6 +36,16 @@ const DropdownUser = () => {
     document.addEventListener('keydown', keyHandler);
     return () => document.removeEventListener('keydown', keyHandler);
   });
+
+
+  const hangdleLogout = async() => {
+    try {
+      await axios.post('/logout');
+      navigate('/')
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
   return (
     <div className="relative">
@@ -153,7 +165,7 @@ const DropdownUser = () => {
             </Link>
           </li>
         </ul>
-        <button className="flex items-center gap-3.5 px-6 py-4 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base">
+        <button type="button" className="flex items-center gap-3.5 px-6 py-4 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base" onClick={hangdleLogout}>
           <svg
             className="fill-current"
             width="22"

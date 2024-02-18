@@ -17,8 +17,15 @@ import Settings from './pages/Settings';
 import Tables from './pages/Tables';
 import Alerts from './pages/UiElements/Alerts';
 import Buttons from './pages/UiElements/Buttons';
-import Table from './components/Tables/TableOne'
-import Product from './components/ProductList/ProductList'
+// import Table from './components/Tables/TableOne'
+// import Product from './components/ProductList/ProductList'
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css'
+import Product from './pages/ProductList/ProductList'
+import Item from './pages/Item/ItemList'
+import Category from './pages/CategoryList/CategoryList'
+import Warehouse from './pages/Warehouse/WarehouseList';
+import Client from './pages/Client/ClientList'
 
 function App() {
   const [loading, setLoading] = useState<boolean>(true);
@@ -74,6 +81,42 @@ function App() {
           }
         /> */}
         <Route
+          path="/item"
+          element={
+            <>
+              <PageTitle title="Item" />
+              <Item  />
+            </>
+          }
+        />
+        <Route
+          path="/category"
+          element={
+            <>
+              <PageTitle title="Category" />
+              <Category  />
+            </>
+          }
+        />
+        <Route
+          path="/warehouse"
+          element={
+            <>
+              <PageTitle title="Warehouse" />
+              <Warehouse  />
+            </>
+          }
+        />
+        <Route
+          path="/client"
+          element={
+            <>
+              <PageTitle title="Clients" />
+              <Client  />
+            </>
+          }
+        />
+        <Route
           path="/calendar"
           element={
             <>
@@ -102,24 +145,6 @@ function App() {
         />
         <Route
           path="/forms/form-layout"
-          element={
-            <>
-              <PageTitle title="Form Layout | TailAdmin - Tailwind CSS Admin Dashboard Template" />
-              <FormLayout />
-            </>
-          }
-        />
-        <Route
-          path="/product/form-elements"
-          element={
-            <>
-              <PageTitle title="Form Elements | TailAdmin - Tailwind CSS Admin Dashboard Template" />
-              <FormElements />
-            </>
-          }
-        />
-        <Route
-          path="/product/form-layout"
           element={
             <>
               <PageTitle title="Form Layout | TailAdmin - Tailwind CSS Admin Dashboard Template" />
@@ -200,6 +225,7 @@ function App() {
           }
         />
       </Routes>
+      <ToastContainer draggable/>
     </>
   );
 }

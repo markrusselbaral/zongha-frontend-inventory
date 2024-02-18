@@ -38,7 +38,7 @@ const SignIn: React.FC = () => {
         setPassword('');
         setPassReq('')
         setEmailReq('')
-        navigate('/dashboard');
+        navigate('/dashboard/all');
         setIsLoading(!isLoading)
       } catch (error: any) {
         console.log(error.response.data.message);

@@ -16,7 +16,7 @@ import axios from '../api/axios';
 const CategoryLayout: React.FC<{ children: ReactNode }> = ({ children }) => {
 
   
-  const {id} = useParams()
+    const {id} = useParams()
     const categoryId = id ? parseInt(id) : undefined;
   
   // const [active, setActive] = useState<number>(1);

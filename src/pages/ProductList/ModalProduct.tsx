@@ -197,7 +197,7 @@ const ModalProduct: React.FC<ModalProductProps> = ({ clickOn, isOpenModal, handl
                                 {/* <input type="text" name="pWarehouse" id="pWarehouse" placeholder='Beef Steak' value={product.pWarehouse} className='h-9 w-full bg-black/10 dark:bg-white border-[1px] border-blue-600 rounded-md text-blue-700 font-semibold outline-1 pl-2 pr-8' onChange={handleInput}/> */}
                                 <select name="pWarehouse" id="pWarehouse" required className='h-9 w-full bg-black/10 dark:bg-white border-[1px] border-blue-600 rounded-md text-blue-700 font-semibold outline-1 pl-2 pr-8' onChange={handleSelect}>
                                     <option>Choose Warehouse</option>
-                                    {warehouseList.map((item,index) => (
+                                    {warehouseList.slice(1).map((item,index) => (
                                         <option key={index} value={`${item.id},${item.name}`} selected={product.pWarehouse === item.name}>{item.name}</option>
                                     ))}
                                 </select>

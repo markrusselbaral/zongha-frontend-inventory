@@ -26,6 +26,9 @@ import Item from './pages/Item/ItemList'
 import Category from './pages/CategoryList/CategoryList'
 import Warehouse from './pages/Warehouse/WarehouseList';
 import Client from './pages/Client/ClientList'
+import Pricing from './pages/Pricing/PricingList'
+import PurchaseList from './pages/Purchase/PurchaseList';
+import NotificationList from './pages/Notification/Notification';
 
 function App() {
   const [loading, setLoading] = useState<boolean>(true);
@@ -113,6 +116,33 @@ function App() {
             <>
               <PageTitle title="Clients" />
               <Client  />
+            </>
+          }
+        />
+        <Route
+          path="/pricing"
+          element={
+            <>
+              <PageTitle title="Pricing" />
+              <Pricing  />
+            </>
+          }
+        />
+        <Route
+          path="/purchase"
+          element={
+            <>
+              <PageTitle title="Purchase" />
+              <PurchaseList  />
+            </>
+          }
+        />
+        <Route
+          path="/notification/:id"
+          element={
+            <>
+              <PageTitle title="Notification" />
+              <NotificationList  />
             </>
           }
         />

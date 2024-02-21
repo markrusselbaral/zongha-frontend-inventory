@@ -3,30 +3,27 @@ import { PRODUCT, PRODUCTDATABASE } from '../../types/product';
 import {WAREHOUSE} from '../../types/warehouse';
 import { ITEMDATABASE } from '../../types/item';
 import DefaultLayout from '../../layout/DefaultLayout';
-import CategoryLayout from '../../layout/CategoryLayout';
 import formatDate from '../../function/FormatDate';
 import axios from '../../api/axios';
-import ModalProduct from './ModalProduct';
+import ModalPurchase from './ModalPurchase';
 import AnimatedText from '../../components/AnimatedText/AnimatedText';
 import { useParams } from 'react-router-dom';
-import CountUp from 'react-countup';
 import Typewriter from 'typewriter-effect';
+import handleCapitalize from '../../components/TextCapitalize/TextCapitalize';
 
 import { MdDelete, MdAddShoppingCart, MdOutlineSearchOff, MdOutlineSearch } from "react-icons/md";
 import { BiSolidSelectMultiple } from "react-icons/bi";
 import { BsDatabaseFillExclamation } from "react-icons/bs";
 import { RiEditCircleFill } from "react-icons/ri";
 import { IoIosExit } from "react-icons/io";
-
-import { FaBoxesStacked } from "react-icons/fa6";
-import { HiArrowDownOnSquareStack } from "react-icons/hi2";
-import { MdOutlineProductionQuantityLimits } from "react-icons/md";
 import Swal from 'sweetalert2';
 import { toast } from 'react-toastify';
 import { PAGINATION } from '../../types/pagination';
+import { PURCHASEDATABASE } from '../../types/purchase';
+import { PURCHASECLIENT, PURCHASEPRODUCT } from '../../types/purchase';
 
 
-const ProductList = () => {
+const PurchaseList = () => {
   const {id} = useParams();
 
   const [search, setSearch] = useState<string>('')
@@ -146,10 +143,10 @@ const ProductList = () => {
     })
     if(result.isConfirmed){
       try {
-        const response = await axios.delete(`/api/product`, {data : {ids : arrayCheck}})
+        const response = await axios.delete(`/api/purchase`, {data : {data : arrayCheck}})
         console.log(response)
         toast.info(
-          `${arrayCheck.length} ${arrayCheck.length === 1 ? 'item' : 'items'} Deleted Successfully`,
+          `Deleted Successfully`,
           {
             position : toast.POSITION.TOP_RIGHT
           }
@@ -246,81 +243,58 @@ const ProductList = () => {
         }
      }
 
-     const [productData, setProductData] = useState<Array<PRODUCTDATABASE>>()
+     const [purchaseData, setPurchaseData] = useState<Array<PURCHASEDATABASE>>()
      const [total, setTotal] = useState<number>()
-     const [soldOut, setSoldOut] = useState<number>()
-     const [quantityTotal, setQuantityTotal] = useState<number>()
      const [perPage, setPerPage] = useState<number>()
-     const [productPagination, setItemPagination] = useState<Array<PAGINATION>>([])
+     const [purchasePagination, setPurchasePagination] = useState<Array<PAGINATION>>([])
      const [isLoading, setIsLoading] = useState<boolean>(false)
 
      const handleFetchData = async(url : string | null, search : string | null) => {
         try {
-          if(id === '0'){
             if(!url){
               setIsLoading(true)
-              const response = await axios.get(`/api/product/product/0?search=${search}`)
-              setProductData(response.data.data.data)
+              const response = await axios.get(`/api/purchase?search=${search}`)
+              console.log("purchasedataaaa",response.data.data.data)
+              console.log("purchase",response.data.data)
+              setPurchaseData(response.data.data.data)
+              // setProductData(response.data.data.data)
               setTotal(response.data.data.total)
               setPerPage(response.data.data.per_page)
-              setItemPagination(response.data.data.links)
-              console.log("this is the product",response.data.soldout)
-              setQuantityTotal(response.data.quantity)
-              setSoldOut(response.data.soldout)
+              setPurchasePagination(response.data.data.links)
               setIsLoading(false)
             }else{
               const urlSplit = url.split('/')
               console.log(urlSplit)
               setIsLoading(true)
-              const response = await axios.get(`/api/product/product/${urlSplit[urlSplit.length-1]}`)
-              setProductData(response.data.data.data)
+              const response = await axios.get(`/${urlSplit[urlSplit.length-2]}/${urlSplit[urlSplit.length-1]}`)
+              setPurchaseData(response.data.data.data)
               setTotal(response.data.data.total)
               setPerPage(response.data.data.per_page)
-              setItemPagination(response.data.data.links)
+              setPurchasePagination(response.data.data.links)
               console.log("this is the product",response.data.data.data)
-              setQuantityTotal(response.data.quantity)
-              setSoldOut(response.data.soldout)
               setIsLoading(false)
             }
-          }else{
-            if(!url){
-              setIsLoading(true)
-              const response = await axios.get(`/api/product/product/${id}?search=${search}`)
-              setProductData(response.data.data.data)
-              setTotal(response.data.data.total)
-              setPerPage(response.data.data.per_page)
-              setItemPagination(response.data.data.links)
-              console.log("this is the warehouse product",response.data.data.data)
-              setQuantityTotal(response.data.quantity)
-              setSoldOut(response.data.soldout)
-              setIsLoading(false)
-            }else{
-              const urlSplit = url.split('/')
-              console.log(urlSplit)
-              setIsLoading(true)
-              const response = await axios.get(`/api/product/product/${urlSplit[urlSplit.length-1]}`)
-              setProductData(response.data.data.data)
-              setTotal(response.data.data.total)
-              setPerPage(response.data.data.per_page)
-              setItemPagination(response.data.data.links)
-              console.log("this is the warehouse product",response.data.data.data)
-              setQuantityTotal(response.data.quantity)
-              setSoldOut(response.data.soldout)
-              setIsLoading(false)
-            }
-          }
+          
         } catch (error) {
           console.log(error)
         }
      }
 
-    //  const handleCalculationQuantity = () => {
-    //   let quantityTotal = 0
-    //   productData?.map(item => {
-    //       quantityTotal += item.quantity
-    //   })
-    //   setQuantityTotal(quantityTotal)
-    // }
+  const [productList , setProductList] = useState<Array<PURCHASEPRODUCT>>([])
+  const [clientList , setClientList] = useState<Array<PURCHASECLIENT>>([])
+
+  const handleClientProductList = async() => {
+    try {
+      const response = await axios.get('/api/purchase/products-clients')
+      console.log("clientlist",response)
+      setClientList(response.data.clients)
+      console.log("productlist",response.data.products)
+      setProductList(response.data.products)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
     
   useEffect(() => {
     handleFetchData(null,'')
@@ -330,10 +304,11 @@ const ProductList = () => {
     // handleFindWarehouse()
     handleFetchItemData()
     // handleCalculationQuantity()
-  }, [id])
+  }, [])
 
   useEffect(() => {
     handleFetchData(null,'')
+    handleClientProductList()
     //kinahanglan ang isOpenModal === false para sa checkbox mu reset
   }, [isOpenModal === false])
 
@@ -354,10 +329,10 @@ const ProductList = () => {
       })
       if(result.isConfirmed){
           try {
-            const response = await axios.delete(`/api/product/${id}`)
+            const response = await axios.delete(`/api/purchase/${id}`)
             console.log(response)
             toast.info(
-              `${name} ${response.data.success}`,
+              `${name} ${response.data.message}`,
               {
                 position: toast.POSITION.TOP_RIGHT
               }
@@ -380,45 +355,16 @@ const ProductList = () => {
   return (
     <DefaultLayout>
       {/* <Breadcrumb pageName="Tables" /> */}
-      <CategoryLayout>
 
         <div className={`fixed inset-0 flex justify-center items-center z-[1000] bg-black/10 backdrop-blur-[2px] ${isOpenModal ? 'visible' : 'invisible'} transition-all duration-200 delay-75`} onClick={handleModal}>
-          <ModalProduct clickOn={(e) => e.stopPropagation()} isOpenModal={isOpenModal} handleModal={handleModal} editId={editId} productData={productData}  warehouseList={warehouseList} itemDataList={itemDataList} handleFetchData={()=> handleFetchData(null,'')}/>
+          <ModalPurchase clickOn={(e) => e.stopPropagation()} isOpenModal={isOpenModal} handleModal={handleModal} editId={editId} purchaseData={purchaseData} productList={productList} clientList={clientList} handleFetchData={()=> handleFetchData(null,'')}/>
         </div>
-
-        <div className='subCategory h-fit mb-2 text-white dark:text-black rounded-sm border gap-6 px-6 py-2  flex flex-col  sm:flex-row items-center justify-evenly border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark overflow-x-auto'>
-          <div className='h-20 w-full bg-[#2563eb] dark:bg-white rounded-md flex items-center px-2 gap-2'>
-              {/* {findWarehouse?.name} */}
-              <FaBoxesStacked className="text-[40px]" />
-              <div className='flex items-center h-full w-full justify-between pr-6'>
-                <h2 className='text-2xl sm:text-xl lg:text-2xl'>Total Product</h2>
-                    <h1 className='text-[40px] sm:text-3xl lg:text-[40px] '><CountUp start={0} end={total ? total : 0} duration={2}/></h1>
-              </div>
-          </div>
-          <div className='h-20 w-full bg-[#2563eb] dark:bg-white rounded-md flex items-center px-2 gap-2'>
-              {/* {findWarehouse?.name} */}
-              <HiArrowDownOnSquareStack className="text-[40px]" />
-              <div className='flex items-center h-full w-full justify-between pr-6'>
-                <h2 className='text-2xl sm:text-xl lg:text-2xl'>Sold Out</h2>
-                <h1 className='text-[40px] sm:text-3xl lg:text-[40px] '><CountUp start={0} end={soldOut ? soldOut : 0} duration={3}/></h1>
-              </div>
-          </div>
-          <div className='h-20 w-full bg-[#2563eb] dark:bg-white rounded-md flex items-center px-2 gap-2'>
-              {/* {findWarehouse?.name} */}
-              <MdOutlineProductionQuantityLimits className="text-[40px]" />
-              <div className='flex items-center h-full w-full justify-between pr-6'>
-                <h2 className='text-2xl sm:text-xl lg:text-2xl'>Quantity</h2>
-
-                <h1 className='text-[40px] sm:text-3xl lg:text-[40px] '><CountUp start={0} end={quantityTotal ? quantityTotal : 0} duration={3}/>KG</h1>
-              </div>
-          </div>
-        </div>
-
+        {/* warehouseList={warehouseList} itemDataList={itemDataList} */}
 
           <div className="rounded-sm border border-stroke bg-white px-5 pt-6 pb-2.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
             <div className='flex flex-col sm:flex-row items-center gap-5 sm:gap-0 sm:justify-between mb-6'>
               <h4 className=" text-xl font-semibold text-black dark:text-white">
-                <AnimatedText name={`Products List`} />
+                <AnimatedText name={`Purchase List`} />
               </h4>
               <div className='flex items-center rounded-md overflow-hidden border-[1px]'>
                 <span className='h-8 w-9 flex justify-center items-center text-md bg-blue-600 text-white text-[22px] font-bold'>{search === '' ? <MdOutlineSearch/> : <MdOutlineSearchOff onClick={()=>{setSearch(''); handleFetchData(null,''); handleSelectDelAll()}}/>}</span>
@@ -428,8 +374,8 @@ const ProductList = () => {
                 <button type="button" className='px-2 bg-blue-600 h-8  rounded-md dark:bg-blue-400 text-white dark:text-black flex justify-center items-center gap-1' onClick={() => {handleModal(); handleSelectDelAll()}}> <MdAddShoppingCart className="text-lg"/> Add</button>
                 {/* <button type="button" className='relative px-2 bg-red-600 h-8 rounded-md dark:bg-red-500 text-white dark:text-black flex justify-center items-center gap-1' onClick={() => {onclickFunction()}}>{btnName === 'Select' ? <BiSolidSelectMultiple className="text-lg"/> : btnName === 'Back' ? <IoIosExit className="text-xl"/> : <MdDelete className="text-lg"/>}<h5 className={`absolute top-[-12px] left-2 text-[14px] bg-blue-600 text-white rounded-full h-5 w-5 p-2 animate-bounce flex justify-center items-center ${checkCount === 0 ? "invisible scale-50 opacity-0" : "visible scale-100 opacity-1"} transition-all duration-150 delay-75`}>{checkCount}</h5>{btnName}</button> */}
                 <div className='relative group'>
-                  <button type="button" disabled={productData?.length === 0 && true} className='relative px-2 bg-red-600 h-8 rounded-md dark:bg-red-500 text-white dark:text-black flex justify-center items-center gap-1' onClick={onclickFunction}>{btnName === 'Select' ? <BiSolidSelectMultiple className="text-lg"/> : btnName === 'Back' ? <IoIosExit className="text-xl"/> : <MdDelete className="text-lg"/>}<h5 className={`absolute top-[-12px] left-2 text-[14px] bg-blue-600 text-white rounded-full h-5 w-5 p-2 animate-bounce flex justify-center items-center ${checkCount === 0 ? "invisible scale-50 opacity-0" : "visible scale-100 opacity-1"} transition-all duration-150 delay-75`}>{checkCount}</h5>{btnName}</button>
-                  {productData?.length === 0 ?
+                  <button type="button" disabled={purchaseData?.length === 0 && true} className='relative px-2 bg-red-600 h-8 rounded-md dark:bg-red-500 text-white dark:text-black flex justify-center items-center gap-1' onClick={onclickFunction}>{btnName === 'Select' ? <BiSolidSelectMultiple className="text-lg"/> : btnName === 'Back' ? <IoIosExit className="text-xl"/> : <MdDelete className="text-lg"/>}<h5 className={`absolute top-[-12px] left-2 text-[14px] bg-blue-600 text-white rounded-full h-5 w-5 p-2 animate-bounce flex justify-center items-center ${checkCount === 0 ? "invisible scale-50 opacity-0" : "visible scale-100 opacity-1"} transition-all duration-150 delay-75`}>{checkCount}</h5>{btnName}</button>
+                  {purchaseData?.length === 0 ?
                     <span className='absolute hidden group-hover:flex group-hover:justify-center group-hover:items-center -top-7 right-[80%] translate-x-full px-2 w-16  bg-blue-600 rounded-lg text-center text-white text-[10px] before:absolute before:bottom-[-16.5px]  before:right-[40%] before:-translate-y-1/2 before:border-6 before:border-x-transparent before:border-b-transparent before:border-t-blue-600 group-hover:transition-all group-hover:duration-500 group-hover:delay-70'>
                       <Typewriter 
                         options={{
@@ -461,12 +407,18 @@ const ProductList = () => {
                                 </div>
                             </th>
                             <th scope="col" className="px-6 py-3">
-                                Pcode
+                                Client Name
                             </th>
                             <th scope="col" className="px-6 py-3">
-                                Name
+                                Tin Number
                             </th>
-                            <th scope="col" className="px-6 py-3 hidden lg:flex h-14 items-center ">
+                            <th scope="col" className="px-6 py-3">
+                                Tin Name
+                            </th>
+                            <th scope="col" className="px-6 py-3">
+                                Product
+                            </th>
+                            <th scope="col" className="px-6 py-3">
                                 Warehouse
                             </th>
                             <th scope="col" className="px-6 py-3">
@@ -474,6 +426,18 @@ const ProductList = () => {
                             </th>
                             <th scope="col" className="px-6 py-3">
                                 Price
+                            </th>
+                            <th scope="col" className="px-6 py-3">
+                                Total Price
+                            </th>
+                            <th scope="col" className="px-6 py-3">
+                                Type
+                            </th>
+                            <th scope="col" className="px-6 py-3">
+                                Date Purchase
+                            </th>
+                            <th scope="col" className="px-6 py-3">
+                                status
                             </th>
                             <th scope="col" className="px-6 py-3">
                                 Date
@@ -485,34 +449,52 @@ const ProductList = () => {
                     </thead>
                     <tbody className= 'text-black font-semibold'>
                     {!isLoading ?
-                        (productData?.length !== 0 ? 
-                          (productData?.map((item : PRODUCTDATABASE,index : number) => (
-                            <tr key={index} className="bg-white dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 even:bg-blue-100 even:border-y-[1px] even:border-blue-700">
-                                <td className={`w-4 p-4 ${isShowCheckbox ? "flex" : "hidden"}`}>
+                        (purchaseData?.length !== 0 ? 
+                          (purchaseData?.map((item : PURCHASEDATABASE,index : number) => (
+                            <tr key={index} className="bg-white dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 even:bg-blue-100 even:border-y-[1px] even:border-blue-700" >
+                                <td className={`w-4 h-32 p-4 py-4 ${isShowCheckbox ? "flex" : "hidden"}`}>
                                     <div className="flex items-center">
                                         <input id={item.id.toString()} value={item.id} type="checkbox" className="checkItem w-4 h-4 text-blue-600 checked:bg-slate-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" onChange={(e) => {handleCheckBox(e)}}/>
                                         <label htmlFor={item.id.toString()} className="sr-only">checkbox</label>
                                     </div>
                                 </td>
                                 <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                                    {item.product_code}
+                                    {handleCapitalize(item.client_name)}
                                 </th>
                                 <td className="px-6 py-4">
+                                    {item.tin_number}
+                                </td>
+                                <td className="px-6 py-4 ">
+                                    {item.tin_name}
+                                </td>
+                                <td className="px-6 py-4 ">
                                     {item.name}
                                 </td>
-                                <td className="px-6 py-4 hidden lg:flex items-center whitespace-nowrap">
-                                    {item.warehouse.name}
+                                <td className="px-6 py-4 ">
+                                    {item.warehouse_name}
                                 </td>
                                 <td className="px-6 py-4">
-                                    <span className={`${item.quantity <= 10 && 'text-red-600'}`}>{item.quantity}</span>
+                                    {item.quantity} Kg
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap">
                                     ₱ {item.price}
                                 </td>
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                    ₱  {item.total_price}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                    {item.type}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                    {item.date}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                    {item.status}
+                                </td>
                                 <td className="px-6 py-4">
                                     {formatDate(item.created_at)}
                                 </td>
-                                <td className="px-2 py-4 flex gap-2">
+                                <td className="px-2 py-4 h-32 flex items-center gap-2">
                                     <button className="font-medium text-white dark:text-black bg-blue-600 dark:bg-blue-400 text-lg h-8 w-8 rounded-lg flex justify-center items-center" onClick={() => {setEditId(item.id); handleModal(); handleSelectDelAll(); setSearch('')}}><RiEditCircleFill/></button>
                                     <button className="font-medium text-white dark:text-black bg-red-600 dark:bg-red-500 text-lg h-8 w-8 rounded-lg flex justify-center items-center" onClick={() => {handleDelete(item.name,item.id); handleSelectDelAll(); setSearch('')}}><MdDelete/></button>
                                 </td>
@@ -520,62 +502,27 @@ const ProductList = () => {
                           )))
                           :
                           <tr className="bg-white h-14 dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 even:bg-blue-100 even:border-y-[1px] even:border-blue-700">
-                            <td colSpan={7} className='w-full'> <div className='flex justify-center items-center gap-3'><div className='relative'><img src='/icons8-box-important.gif' alt='nodata' className='h-6 absolute w-6 bottom-[-6px] right-[-6px]'/><BsDatabaseFillExclamation className="text-3xl text-blue-700"/></div>No Data Saved </div></td>
+                            <td colSpan={13} className='w-full'> <div className='flex justify-center items-center gap-3'><div className='relative'><img src='/icons8-box-important.gif' alt='nodata' className='h-6 absolute w-6 bottom-[-6px] right-[-6px]'/><BsDatabaseFillExclamation className="text-3xl text-blue-700"/></div>No Data Saved </div></td>
                           </tr> )
                       :
                       <tr className="bg-white h-14 dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 even:bg-blue-100 even:border-y-[1px] even:border-blue-700">
-                        <td colSpan={7} className='w-full'> <div className='flex justify-center items-center'><img src='/loadingc.svg' alt='loading' className='h-10'/>Data Fetching... </div></td>
+                        <td colSpan={13} className='w-full'> <div className='flex justify-center items-center'><img src='/loadingc.svg' alt='loading' className='h-10'/>Data Fetching... </div></td>
                       </tr>
                       }
-                      {/* {productData?.map((item : PRODUCTDATABASE,index : number) => (
-                        <tr key={index} className="bg-white dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 even:bg-blue-100 even:border-y-[1px] even:border-blue-700">
-                            <td className={`w-4 p-4 ${isShowCheckbox ? "flex" : "hidden"}`}>
-                                <div className="flex items-center">
-                                    <input id={item.id.toString()} value={item.id} type="checkbox" className="checkItem w-4 h-4 text-blue-600 checked:bg-slate-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" onChange={(e) => {handleCheckBox(e)}}/>
-                                    <label htmlFor={item.id.toString()} className="sr-only">checkbox</label>
-                                </div>
-                            </td>
-                            <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                                {item.product_code}
-                            </th>
-                            <td className="px-6 py-4">
-                                {item.name}
-                            </td>
-                            <td className="px-6 py-4 hidden lg:flex items-center whitespace-nowrap">
-                                {item.warehouse.name}
-                            </td>
-                            <td className="px-6 py-4">
-                                {item.quantity}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                                ₱ {item.price}
-                            </td>
-                            <td className="px-6 py-4">
-                                {formatDate(item.created_at)}
-                            </td>
-                            <td className="px-2 py-4 flex gap-2">
-                                <button className="font-medium text-white dark:text-black bg-blue-600 dark:bg-blue-400 text-lg h-8 w-8 rounded-lg flex justify-center items-center" onClick={() => {setEditId(item.id); handleModal(); handleSelectDelAll(); setSearch('')}}><RiEditCircleFill/></button>
-                                <button className="font-medium text-white dark:text-black bg-red-600 dark:bg-red-500 text-lg h-8 w-8 rounded-lg flex justify-center items-center" onClick={() => {handleDelete(item.name,item.id); handleSelectDelAll(); setSearch('')}}><MdDelete/></button>
-                            </td>
-                        </tr>
-                      ))} */}
                     </tbody>
                 </table>
                 <nav className="flex items-center flex-column flex-wrap md:flex-row justify-between pt-4" aria-label="Table navigation">
                     <span className="text-sm font-normal text-black dark:text-white mb-4 md:mb-0 block w-full md:inline md:w-auto">Showing <span className="font-semibold text-gray-900 dark:text-white">1-{perPage}</span> of <span className="font-semibold text-gray-900 dark:text-white">{total}</span></span>
                     <ul className={`inline-flex -space-x-px rtl:space-x-reverse text-sm h-8 ${total! <= perPage! ? "invisible" : "visible"}`}>
-                    {productPagination.map((item : PAGINATION, index : number) => (
-                          <li key={index} className={`${item.active ? 'bg-cyan-600 text-white' : null} flex items-center justify-center font-semibold px-3 h-8 ms-0 leading-tight text-gray-500 bg-white border border-blue-600 hover:bg-blue-900 hover:text-white dark:hover:bg-blue-900 dark:hover:text-white  dark:border-gray-700 dark:text-gray-400  cursor-pointer ${index === 0 ? 'first:rounded-l-xl' : ''} ${index === productPagination.length - 1 ? 'last:rounded-r-xl' : ''} transition-all duration-200 delay-75`} dangerouslySetInnerHTML={{__html: item.label}} onClick={() => { handleFetchData(item.url, ''); handleSelectDelAll()}}/>
+                    {purchasePagination.map((item : PAGINATION, index : number) => (
+                          <li key={index} className={`${item.active ? 'bg-cyan-600 text-white' : null} flex items-center justify-center font-semibold px-3 h-8 ms-0 leading-tight text-gray-500 bg-white border border-blue-600 hover:bg-blue-900 hover:text-white dark:hover:bg-blue-900 dark:hover:text-white  dark:border-gray-700 dark:text-gray-400  cursor-pointer ${index === 0 ? 'first:rounded-l-xl' : ''} ${index === purchasePagination.length - 1 ? 'last:rounded-r-xl' : ''} transition-all duration-200 delay-75`} dangerouslySetInnerHTML={{__html: item.label}} onClick={() => { handleFetchData(item.url, ''); handleSelectDelAll()}}/>
                         ))}
                     </ul>
                 </nav>
             </div>
-
-
           </div>
-      </CategoryLayout>
     </DefaultLayout>
   );
 };
 
-export default ProductList;
+export default PurchaseList;

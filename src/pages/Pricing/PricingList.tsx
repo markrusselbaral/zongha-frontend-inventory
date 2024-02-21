@@ -1,10 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 import axios from '../../api/axios';
 import { PAGINATION } from '../../types/pagination';
-import { WAREHOUSEDATABASE, WAREHOUSE } from '../../types/warehouse';
-import { CLIENTDATABASE } from '../../types/client';
 import DefaultLayout from '../../layout/DefaultLayout';
-import ModalClient from './ModalClient';
+import ModalPricing from './ModalPricing';
 import formatDate from '../../function/FormatDate';
 import { MdDelete, MdOutlineSearchOff, MdOutlineSearch } from "react-icons/md";
 import AnimatedText from '../../components/AnimatedText/AnimatedText';
@@ -16,12 +14,12 @@ import { toast } from 'react-toastify';
 import Swal from 'sweetalert2';
 import Typewriter from 'typewriter-effect';
 import handleCapitalize from '../../components/TextCapitalize/TextCapitalize';
-import handleTinNumber from '../../components/TinFormatter/TinFormatter';
+import { PRICINGCLIENT, PRICINGPRODUCT, PRICINGDATABASE } from '../../types/pricing';
 
 import { FaUserPlus } from "react-icons/fa6";
 
 
-const ClientList = () => {
+const PricingList = () => {
 
   const [search, setSearch] = useState<string>('')
 
@@ -138,7 +136,7 @@ const ClientList = () => {
     })
     if(result.isConfirmed){
       try {
-        const response = await axios.delete(`/api/client`, {data : {data : arrayCheck}})
+        const response = await axios.delete(`/api/pricing`, {data : {data : arrayCheck}})
         console.log(response)
         toast.info(
           `${arrayCheck.length} ${arrayCheck.length === 1 ? 'item' : 'items'} Deleted Successfully`,
@@ -172,37 +170,37 @@ const ClientList = () => {
     setIsOpenMpdal(!isOpenModal)
   }
 
-  // const [categoryList, setCategoryList] = useState<Array<CATEGORY>>([])
+  const [productList , setProductList] = useState<Array<PRICINGPRODUCT>>([])
+  const [clientList , setClientList] = useState<Array<PRICINGCLIENT>>([])
 
-  //   const getCategory = async() => {
-  //       try {
-  //           const response = await axios.get('/api/category')
-  //           console.log(response.data.categories.data)
-  //           setCategoryList(response.data.categories.data)
-  //       } catch (error) {
-  //           console.log(error)
-  //       }
-  //   }
+  const handleClientProductList = async() => {
+    try {
+      const response = await axios.get('/api/pricing/create')
+      console.log("clientlist",response.data.clients)
+      setClientList(response.data.clients)
+      console.log("productlist",response.data.products)
+      setProductList(response.data.products)
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
-  //   useEffect(() => {
-  //       getCategory()
-  //   },[])
 
   const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [clientDataList, setClientDataList] = useState<Array<CLIENTDATABASE>>([])
+  const [pricingDataList, setPricingDataList] = useState<Array<PRICINGDATABASE>>([])
   const [perPage, setPerPage] = useState<number>()
-  const [clientPagination, setClientPagination] = useState<Array<PAGINATION>>([])
+  const [pricingPagination, setPricingPagination] = useState<Array<PAGINATION>>([])
   const [total, setTotal] = useState<number>(0)
 
   const handleFetchData = async(url : string | null, search : string | null) => {
           try {
             if(!url){
-              // console.log(search, `/api/item?search=${search}`)
+              console.log(search, `/api/item?search=${search}`)
               setIsLoading(true)
-              const response = await axios.get(`/api/client?search=${search}`)
-              console.log(response)
-              setClientDataList(response.data.data.data)
-              setClientPagination(response.data.data.links)
+              const response = await axios.get(`/api/pricing?search=${search}`)
+              console.log("jkyhjksagfaskljfvhxjvsmg",response.data.data.data)
+              setPricingDataList(response.data.data.data)
+              setPricingPagination(response.data.data.links)
               setPerPage(response.data.data.per_page)
               setTotal(response.data.data.total)
               // console.log("this is the pager",response.data.data.links)
@@ -215,9 +213,9 @@ const ClientList = () => {
               // console.log(`/${urlSplit[urlSplit.length-2]}/${urlSplit[urlSplit.length-1]}?search=${search}`)
               setIsLoading(true)
               const response = await axios.get(`/${urlSplit[urlSplit.length-2]}/${urlSplit[urlSplit.length-1]}`)
-              setClientDataList(response.data.data.data)
+              setPricingDataList(response.data.data.data)
               console.log("this is the pager",response.data.data.links)
-              setClientPagination(response.data.data.links)
+              setPricingPagination(response.data.data.links)
               console.log("this is the countperPage",response.data.data.per_page)
               setPerPage(response.data.data.per_page)
               console.log("this is the total",response.data.data.total)
@@ -233,8 +231,10 @@ const ClientList = () => {
             )
           }
   }
+
   useEffect(() => {
     handleFetchData(null,'')
+    handleClientProductList()
     //kinahanglan ang isOpenModal === false para sa checkbox mu reset
   }, [isOpenModal === false])
 
@@ -250,7 +250,7 @@ const ClientList = () => {
     })
     if(result.isConfirmed){
       try {
-        const response = await axios.delete(`/api/client/${id}`)
+        const response = await axios.delete(`/api/pricing/${id}`)
         console.log(response.data.message)
         toast.success(
           ` ${name} ${response.data.message}`,
@@ -279,14 +279,14 @@ const ClientList = () => {
     <DefaultLayout>
 
         <div className={`fixed inset-0 flex justify-center items-center z-[1000] bg-black/10 backdrop-blur-[2px] ${isOpenModal ? 'visible' : 'invisible'} transition-all duration-200 delay-75`} onClick={handleModal}>
-          <ModalClient clickOn={(e) => e.stopPropagation()} isOpenModal={isOpenModal} handleModal={handleModal} editId={editId}  clientDataList={clientDataList} /* categoryList={categoryList} */ handleFetchData={()=> handleFetchData(null,'')}/>
+          <ModalPricing clickOn={(e) => e.stopPropagation()} isOpenModal={isOpenModal} handleModal={handleModal} editId={editId}  pricingDataList={pricingDataList} productList={productList} clientList={clientList} handleFetchData={()=> handleFetchData(null,'')}/>
         </div>
 
 
           <div className="rounded-sm border border-stroke bg-white px-5 pt-6 pb-2.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
             <div className='flex flex-col sm:flex-row items-center gap-5 sm:gap-0 sm:justify-between mb-6'>
               <h4 className=" text-xl font-semibold text-black dark:text-white flex justify-center items-center gap-1">
-                <AnimatedText name="Client List"/>
+                <AnimatedText name="Pricing List"/>
               </h4>
               <div className='flex items-center rounded-md overflow-hidden border-[1px]'>
                 <span className='h-8 w-9 flex justify-center items-center text-md bg-blue-600 text-white text-[22px] font-bold'>{search === '' ? <MdOutlineSearch/> : <MdOutlineSearchOff onClick={()=> {setSearch(''); handleFetchData(null, '')}}/>}</span>
@@ -295,8 +295,8 @@ const ClientList = () => {
               <div className='font-semibold flex gap-3'>
                 <button type="button" className='px-2 bg-blue-600 h-8  rounded-md dark:bg-blue-400 text-white dark:text-black flex justify-center items-center gap-1' onClick={() => {handleModal(); handleSelectDelAll();setSearch('')}}> <FaUserPlus className="text-lg"/> Add</button>
                 <div className='relative group'>
-                  <button type="button" disabled={clientDataList.length === 0 && true} className='relative px-2 bg-red-600 h-8 rounded-md dark:bg-red-500 text-white dark:text-black flex justify-center items-center gap-1' onClick={onclickFunction}>{btnName === 'Select' ? <BiSolidSelectMultiple className="text-lg"/> : btnName === 'Back' ? <IoIosExit className="text-xl"/> : <MdDelete className="text-lg"/>}<h5 className={`absolute top-[-12px] left-2 text-[14px] bg-blue-600 text-white rounded-full h-5 w-5 p-2 animate-bounce flex justify-center items-center ${checkCount === 0 ? "invisible scale-50 opacity-0" : "visible scale-100 opacity-1"} transition-all duration-150 delay-75`}>{checkCount}</h5>{btnName}</button>
-                  {clientDataList.length === 0 ?
+                  <button type="button" disabled={pricingDataList.length === 0 && true} className='relative px-2 bg-red-600 h-8 rounded-md dark:bg-red-500 text-white dark:text-black flex justify-center items-center gap-1' onClick={onclickFunction}>{btnName === 'Select' ? <BiSolidSelectMultiple className="text-lg"/> : btnName === 'Back' ? <IoIosExit className="text-xl"/> : <MdDelete className="text-lg"/>}<h5 className={`absolute top-[-12px] left-2 text-[14px] bg-blue-600 text-white rounded-full h-5 w-5 p-2 animate-bounce flex justify-center items-center ${checkCount === 0 ? "invisible scale-50 opacity-0" : "visible scale-100 opacity-1"} transition-all duration-150 delay-75`}>{checkCount}</h5>{btnName}</button>
+                  {pricingDataList.length === 0 ?
                     <span className='absolute hidden group-hover:flex group-hover:justify-center group-hover:items-center -top-7 right-[80%] translate-x-full px-2 w-16  bg-blue-600 rounded-lg text-center text-white text-[10px] before:absolute before:bottom-[-16.5px]  before:right-[40%] before:-translate-y-1/2 before:border-6 before:border-x-transparent before:border-b-transparent before:border-t-blue-600 group-hover:transition-all group-hover:duration-500 group-hover:delay-70'>
                       <Typewriter 
                         options={{
@@ -328,16 +328,13 @@ const ClientList = () => {
                                 </div>
                             </th>
                             <th scope="col" className="px-6 py-3">
-                                Name
+                                Client Name
                             </th>
                             <th scope="col" className="px-6 py-3">
-                                Tin Name
+                                Product Name
                             </th>
                             <th scope="col" className="px-6 py-3">
-                                Tin Number
-                            </th>
-                            <th scope="col" className="px-6 py-3">
-                                Type
+                                Price
                             </th>
                             <th scope="col" className="px-6 py-3">
                                 Date Created
@@ -349,8 +346,8 @@ const ClientList = () => {
                     </thead>
                     <tbody className= 'text-black font-semibold'>
                       {!isLoading ?
-                        (clientDataList.length !== 0 ? 
-                          (clientDataList?.map((item : CLIENTDATABASE ,index : number) => (
+                        (pricingDataList.length !== 0 ? 
+                          (pricingDataList?.map((item : PRICINGDATABASE ,index : number) => (
                             <tr key={index} className="bg-white dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 even:bg-blue-100 even:border-y-[1px] even:border-blue-700">
                                 <td className={`w-4 p-4 ${isShowCheckbox ? "flex" : "hidden"}`}>
                                     <div className="flex items-center">
@@ -359,23 +356,20 @@ const ClientList = () => {
                                     </div>
                                 </td>
                                 <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                                    {handleCapitalize(item.name)}
+                                    {handleCapitalize(item.client_name)}
                                 </th>
                                 <td className="px-6 py-4">
-                                    {item.tin_name}
+                                    {item.product_name}
                                 </td>
                                 <td className="px-6 py-4">
-                                    {item.tin_number}
+                                    ₱ {item.price}
                                 </td>
                                 <td className="px-6 py-4">
-                                    {handleCapitalize(item.type)}
-                                </td>
-                                <td className="px-6 py-4">
-                                    {formatDate(item.created_at!)}
+                                    {formatDate(item.updated_at!)}
                                 </td>
                                 <td className="px-2 py-4 flex justify-center items-center gap-2">
                                     <button className="font-medium text-white dark:text-black bg-blue-600 dark:bg-blue-400 text-lg h-8 w-8 rounded-lg flex justify-center items-center" onClick={() => {setEditId(item.id); handleModal();handleSelectDelAll();setSearch('')}}><RiEditCircleFill/></button>
-                                    <button className="font-medium text-white dark:text-black bg-red-600 dark:bg-red-500 text-lg h-8 w-8 rounded-lg flex justify-center items-center" onClick={()=>{handleDelete(item.name,item.id!);handleSelectDelAll();setSearch('')}}><MdDelete/></button>
+                                    <button className="font-medium text-white dark:text-black bg-red-600 dark:bg-red-500 text-lg h-8 w-8 rounded-lg flex justify-center items-center" onClick={()=>{handleDelete(item.client_name,item.id!);handleSelectDelAll();setSearch('')}}><MdDelete/></button>
                                 </td>
                             </tr>
                           )))
@@ -393,8 +387,8 @@ const ClientList = () => {
                 <nav className="flex items-center flex-column flex-wrap md:flex-row justify-between pt-4" aria-label="Table navigation">
                     <span className="text-sm font-normal text-black dark:text-gray-400 mb-4 md:mb-0 block w-full md:inline md:w-auto">Showing <span className="font-semibold text-black dark:text-white">1-{perPage}</span> of <span className="font-semibold text-gray-900 dark:text-white">{total}</span></span>
                     <ul className={`inline-flex -space-x-px rtl:space-x-reverse text-sm h-8 ${total! <= perPage! ? "invisible" : "visible"}`}>
-                    {clientPagination.map((item : PAGINATION, index : number) => (
-                          <li key={index} className={`${item.active ? 'bg-cyan-600 text-white' : null} flex items-center justify-center font-semibold px-3 h-8 ms-0 leading-tight text-gray-500 bg-white border border-blue-600 hover:bg-blue-900 hover:text-white dark:hover:bg-blue-900 dark:hover:text-white  dark:border-gray-700 dark:text-gray-400  cursor-pointer ${index === 0 ? 'first:rounded-l-xl' : ''} ${index === clientPagination.length - 1 ? 'last:rounded-r-xl' : ''} transition-all duration-200 delay-75`} dangerouslySetInnerHTML={{__html: item.label}} onClick={() => {handleFetchData(item.url, ''); handleSelectDelAll()}}/>
+                    {pricingPagination.map((item : PAGINATION, index : number) => (
+                          <li key={index} className={`${item.active ? 'bg-cyan-600 text-white' : null} flex items-center justify-center font-semibold px-3 h-8 ms-0 leading-tight text-gray-500 bg-white border border-blue-600 hover:bg-blue-900 hover:text-white dark:hover:bg-blue-900 dark:hover:text-white  dark:border-gray-700 dark:text-gray-400  cursor-pointer ${index === 0 ? 'first:rounded-l-xl' : ''} ${index === pricingPagination.length - 1 ? 'last:rounded-r-xl' : ''} transition-all duration-200 delay-75`} dangerouslySetInnerHTML={{__html: item.label}} onClick={() => {handleFetchData(item.url, ''); handleSelectDelAll()}}/>
                         ))}
                     </ul>
                 </nav>
@@ -406,4 +400,4 @@ const ClientList = () => {
   );
 };
 
-export default ClientList;
+export default PricingList;

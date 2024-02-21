@@ -136,7 +136,7 @@ const WarehouseList = () => {
         const response = await axios.delete(`/api/warehouse`, {data : {ids : arrayCheck}})
         console.log(response)
         toast.info(
-          `Deleted Successfully`,
+          `${arrayCheck.length} ${arrayCheck.length === 1 ? 'item' : 'items'} Deleted Successfully`,
           {
             position : toast.POSITION.TOP_RIGHT
           }
@@ -152,6 +152,7 @@ const WarehouseList = () => {
         )
       }
       handleSelectDelAll()
+      setSearch('')
     }
   }
   
@@ -374,7 +375,7 @@ const WarehouseList = () => {
                 </table>
                 <nav className="flex items-center flex-column flex-wrap md:flex-row justify-between pt-4" aria-label="Table navigation">
                     <span className="text-sm font-normal text-black dark:text-white mb-4 md:mb-0 block w-full md:inline md:w-auto">Showing <span className="font-semibold text-black dark:text-white">1-{perPage}</span> of <span className="font-semibold text-gray-900 dark:text-white">{total}</span></span>
-                    <ul className={`inline-flex -space-x-px rtl:space-x-reverse text-sm h-8 ${total! <= 10 ? "invisible" : "visible"}`}>
+                    <ul className={`inline-flex -space-x-px rtl:space-x-reverse text-sm h-8 ${total! <= perPage! ? "invisible" : "visible"}`}>
                     {warehousePagination.map((item : PAGINATION, index : number) => (
                           <li key={index} className={`${item.active ? 'bg-cyan-600 text-white' : null} flex items-center justify-center font-semibold px-3 h-8 ms-0 leading-tight text-gray-500 bg-white border border-blue-600 hover:bg-blue-900 hover:text-white dark:hover:bg-blue-900 dark:hover:text-white  dark:border-gray-700 dark:text-gray-400  cursor-pointer ${index === 0 ? 'first:rounded-l-xl' : ''} ${index === warehousePagination.length - 1 ? 'last:rounded-r-xl' : ''} transition-all duration-200 delay-75`} dangerouslySetInnerHTML={{__html: item.label}} onClick={() => {handleFetchData(item.url, ''); handleSelectDelAll()}}/>
                         ))}

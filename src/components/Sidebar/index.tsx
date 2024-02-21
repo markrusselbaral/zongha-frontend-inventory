@@ -5,11 +5,13 @@ import AnimatedText from '../AnimatedText/AnimatedText';
 import Logo from '../../images/logo/logo.svg';
 
 import { FaBoxOpen, FaShoppingCart} from "react-icons/fa";
+import { FcSalesPerformance } from "react-icons/fc";
 import { FaUserGroup } from "react-icons/fa6";
-import { MdOutlineWarehouse } from "react-icons/md";
+import { MdOutlineWarehouse, MdNotificationsNone } from "react-icons/md";
 import { CgProductHunt } from "react-icons/cg";
 import { TbMeat } from "react-icons/tb";
-import { IoFileTrayStackedOutline } from "react-icons/io5";
+// import { IoPricetagsOutline } from "react-icons/io5";
+import { IoFileTrayStackedOutline, IoPricetagsOutline } from "react-icons/io5";
 
 interface SidebarProps {
   sidebarOpen: boolean;
@@ -226,6 +228,21 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
               </SidebarLinkGroup>
               {/* <!-- Menu Item Dashboard --> */}
 
+              {/* <!-- Menu Item Purchase --> */}
+              <li>
+                <NavLink
+                  to="/purchase"
+                  className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
+                    pathname.includes('purchase') &&
+                    'bg-graydark dark:bg-meta-4'
+                  }`}
+                >
+                  <FcSalesPerformance className="text-xl"/>
+                  <AnimatedText name="Purchase" />
+                </NavLink>
+              </li>
+              {/* <!-- Menu Item Purchase --> */}
+
               {/* <!-- Menu Item Product --> */}
               <li>
                 <NavLink
@@ -300,6 +317,36 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                 </NavLink>
               </li>
               {/* <!-- Menu Clients  --> */}
+
+              {/* <!-- Menu Pricing  --> */}
+              <li>
+                <NavLink
+                  to="/pricing"
+                  className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
+                    pathname.includes('pricing') &&
+                    'bg-graydark dark:bg-meta-4'
+                  }`}
+                >
+                  <IoPricetagsOutline className="text-xl"/>
+                  <AnimatedText name="Pricing" />
+                </NavLink>
+              </li>
+              {/* <!-- Menu Pricing  --> */}
+
+              {/* <!-- Menu Notification  --> */}
+              <li>
+                <NavLink
+                  to="/notification/0"
+                  className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
+                    pathname.includes('notification') &&
+                    'bg-graydark dark:bg-meta-4'
+                  }`}
+                >
+                  <MdNotificationsNone className="text-xl"/>
+                  <AnimatedText name="Notification" />
+                </NavLink>
+              </li>
+              {/* <!-- Menu Notification  --> */}
 
               {/* <!-- Menu Item Calendar --> */}
               <li>

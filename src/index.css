@@ -25,6 +25,7 @@ input[type="number"]::-webkit-inner-spin-button{
 
 .modalScroll::-webkit-scrollbar-thumb {
   background: #3c50e0; 
+  margin-left: 10px;
 } 
   /* Adjust the padding if necessary */
 ::-webkit-scrollbar-track:horizontal {
